@@ -1,0 +1,8 @@
+ip_address: 192.168.1.100
+synced_folders:
+  user:
+    source: 'C:\Users\Toilal' # absolute or relative path from Vagrantfile
+    target: '/C/Users/Toilal' # absolute or relative path from home of VM
+  project:
+    source: 'D:\' # absolute or relative path from Vagrantfile
+    target: '/D' # absolute or relative path from home of VM

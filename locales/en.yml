@@ -1,0 +1,40 @@
+---
+en:
+  vagrant_nfs4j:
+    nfs4j_daemon:
+      errors:
+        unavailable: |-
+          nfs4j-daemon is not running. You should either start nfs4j-daemon manually with --api-port=%{api_port} option, or set "config.nfs4j.daemon_start = true" in Vagrantfile configuration.
+        start_failed: |-
+          nfs4j-daemon has failed to start. (%{cause})
+        stop_failed: |-
+          nfs4j-daemon has failed to stop. (%{cause})
+        attach_failed: |-
+          NFS share attach has failed. (%{cause})
+        detach_failed: |-
+          NFS share detach has failed. (%{cause})
+        status_failed: |-
+          NFS share status can't be retrieved. (%{cause})
+      is_already_running: |-
+        nfs4j-daemon is running and ready to serve.
+      is_starting: |-
+        nfs4j-daemon is going to start with the following command (%{cmd})
+      has_been_started: |-
+        nfs4j-daemon has been started and is ready to serve.
+      installing_firewall_rule: |-
+        Installing windows firewall rule %{rule_name}.
+      firewall_rule_installed: |-
+        Windows firewall rule %{rule_name} has been installed.
+    cap:
+      nfs_export:
+        attaching_share: |-
+          Adding NFS share to nfs4j-daemon: %{path} => %{alias}
+        detaching_existing_share: |-
+          Removing existing NFS share from nfs4j-daemon: %{path} => %{alias}
+      nfs_prune:
+        pruning_share: |-
+          Pruning orphan NFS share from nfs4j-daemon: %{path} => %{alias}
+    firewall:
+      error: |-
+        It seems that you don't have the privileges to change the firewall rules. NFS will not work without that firewall
+        changes. Execute the following commands via cmd as administrator:
