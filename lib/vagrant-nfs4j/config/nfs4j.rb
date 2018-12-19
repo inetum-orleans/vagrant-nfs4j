@@ -51,6 +51,9 @@ module VagrantNfs4j
         @daemon_opts = nil if @daemon_opts == UNSET_VALUE
         @java_home = ENV['JAVA_HOME'] if @java_home == UNSET_VALUE
         @java_opts = ENV['JAVA_OPTS'] if @java_opts == UNSET_VALUE
+
+        ENV['JAVA_HOME'] = @java_home if @java_home
+        ENV['JAVA_OPTS'] = @java_opts if @java_opts
       end
     end
   end
