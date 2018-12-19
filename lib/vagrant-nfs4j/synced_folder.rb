@@ -21,9 +21,28 @@ module VagrantNfs4j
       machine_ip = nfsopts[:nfs_machine_ip]
       machine_ip = [machine_ip] unless machine_ip.is_a?(Array)
 
+      # Keep nfs_version and nfs_udp configured by user to remove default
+      # vers=3,udp options
+      config_nfs_versions = {}
+      config_nfs_udps = {}
+      folders.each do |id, opts|
+        config_nfs_versions[id] = opts[:nfs_version]
+        config_nfs_udps[id] = opts[:nfs_udp]
+      end
+
       # Prepare the folder, this means setting up various options
       # and such on the folder itself.
       folders.each {|id, opts| prepare_folder(machine, opts)}
+
+      # Restore configured nfs_version
+      folders.each do |id, opts|
+        opts[:nfs_udp] = config_nfs_udps[id]
+        opts[:nfs_version] = config_nfs_versions[id]
+        unless opts[:nfs_version]
+          # Use nfs v4.1 as default version
+          opts[:nfs_version] = '4.1'
+        end
+      end
 
       # Determine what folders we'll export
       export_folders = folders.dup
@@ -62,9 +81,6 @@ module VagrantNfs4j
         real_hostpath = opts[:hostpath]
         if Vagrant::Util::Platform.windows?
           opts[:hostpath] = VagrantNfs4j::Utils.prefix_alias(machine, opts[:guestpath])
-          if opts[:hostpath].start_with?('/')
-            opts[:hostpath][0] = ''
-          end
         end
 
         opts[:mount_options] = VagrantNfs4j::Utils.apply_mount_options(opts[:mount_options])

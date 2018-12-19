@@ -54,9 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.synced_folder source, target,
                               id: "#{id}",
                               type: 'nfs',
-                              mount_options: mount_options,
-                              nfs_version: '4.1',
-                              nfs_udp: false
+                              mount_options: mount_options
     end
   end
 end
