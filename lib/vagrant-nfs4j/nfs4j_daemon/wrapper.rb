@@ -136,7 +136,7 @@ module VagrantNfs4j
                              VagrantNfs4j::Utils.which("java")
                            end
 
-                jar.is_a?(String) ? "#{java_exe} -jar #{jar}" : "java -jar #{@jar}"
+                jar.is_a?(String) ? "#{java_exe} -jar #{jar}" : "#{java_exe} -jar #{@jar}"
               end
 
         unless exe
@@ -146,9 +146,7 @@ module VagrantNfs4j
             java_opts = " #{java_opts}"
           end
 
-          if java_home
-            bin = "#{java_home}\\bin\\#{bin}#{java_opts}"
-          end
+          bin = "#{bin}#{java_opts}"
         end
 
         if opts
