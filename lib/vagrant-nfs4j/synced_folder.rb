@@ -59,16 +59,19 @@ module VagrantNfs4j
       folders.each do |id, opts|
         opts = opts.dup
 
+        real_hostpath = opts[:hostpath]
         if Vagrant::Util::Platform.windows?
-          opts[:hostpath] = VagrantNfs4j::Utils.hostpath_to_share_alias(opts[:hostpath])
-          opts[:hostpath] = VagrantNfs4j::Utils.prefix_alias(machine, opts[:hostpath])
+          opts[:hostpath] = VagrantNfs4j::Utils.prefix_alias(machine, opts[:guestpath])
+          if opts[:hostpath].start_with?('/')
+            opts[:hostpath][0] = ''
+          end
         end
 
         opts[:mount_options] = VagrantNfs4j::Utils.apply_mount_options(opts[:mount_options])
 
         machine.ui.detail(I18n.t('vagrant.actions.vm.share_folders.mounting_entry',
                                  guestpath: opts[:guestpath],
-                                 hostpath: opts[:hostpath]))
+                                 hostpath: real_hostpath))
 
         mount_folders[id] = opts
       end
