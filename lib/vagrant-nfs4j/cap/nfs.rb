@@ -21,7 +21,7 @@ module VagrantNfs4j
           end
         end
 
-        wrapper.setup_firewall(machine.ui, config.java_home)
+        wrapper.setup_firewall(machine.ui, config.setup_firewall, config.java_home)
 
         wrapper.start(machine.ui,
                       config.daemon_start,

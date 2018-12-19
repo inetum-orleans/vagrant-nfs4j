@@ -22,9 +22,15 @@ en:
       has_been_started: |-
         nfs4j-daemon has been started and is ready to serve.
       installing_firewall_rule: |-
-        Installing windows firewall rule %{rule_name}.
+        Installing Windows firewall rule %{rule_name}.
       firewall_rule_installed: |-
         Windows firewall rule %{rule_name} has been installed.
+      firewall_error: |-
+        It seems that you don't have the privileges to change the Windows firewall rules. NFS may not work without 
+        custom firewall rules. Execute the following commands as administrator:
+      firewall_manual: |-
+        Setup of the Windows firewall is dsabled. NFS may not work without custom firewall rules. 
+        Execute the following commands as administrator:
     cap:
       nfs_export:
         attaching_share: |-
@@ -34,7 +40,3 @@ en:
       nfs_prune:
         pruning_share: |-
           Pruning orphan NFS share from nfs4j-daemon: %{path} => %{alias}
-    firewall:
-      error: |-
-        It seems that you don't have the privileges to change the firewall rules. NFS will not work without that firewall
-        changes. Execute the following commands via cmd as administrator:

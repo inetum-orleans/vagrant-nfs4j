@@ -32,7 +32,7 @@ module VagrantNfs4j
         end
       end
 
-      def setup_firewall(ui, java_home)
+      def setup_firewall(ui, setup_firewall, java_home)
         java_exe = if java_home
                      additional_path = File.join(java_home, 'bin')
                      VagrantNfs4j::Utils.which("java", additional_path)
@@ -42,13 +42,15 @@ module VagrantNfs4j
 
         java_exe = java_exe.gsub('/', '\\')
 
-        rule_name = "vagrant-nfs4j-#{VagrantNfs4j::VERSION}-#{java_exe}-tcp-2049".gsub('\\', '-').gsub(':', '')
+        ports = [2049, @api_port]
+
+        rule_name = "vagrant-nfs4j-#{VagrantNfs4j::VERSION}-#{java_exe}-tcp-#{ports.join(',')}".gsub('\\', '-').gsub(':', '')
         rule_exist = "netsh advfirewall firewall show rule name=\"#{rule_name}\">nul"
 
         unless system(sprintf(rule_exist, rule_name))
-          ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.installing_firewall_rule', rule_name: rule_name))
 
-          rule_template = "advfirewall firewall add rule name=\"%s\" dir=\"%s\" action=allow protocol=TCP localport=2049 program=\"%s\" profile=any"
+
+          rule_template = "advfirewall firewall add rule name=\"%s\" dir=\"%s\" action=allow protocol=TCP localport=#{ports.join(',')} program=\"%s\" profile=any"
 
           all_rules = []
           all_rules.push("advfirewall firewall delete rule name=\"#{rule_name}\"")
@@ -62,12 +64,21 @@ module VagrantNfs4j
             firewall_rule += " \" #{rule}\""
           end
 
-          if system(firewall_rule) and system(sprintf(rule_exist, rule_name))
-            ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_rule_installed', rule_name: rule_name))
+          if setup_firewall
+            ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.installing_firewall_rule', rule_name: rule_name))
+
+            if system(firewall_rule) and system(sprintf(rule_exist, rule_name))
+              ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_rule_installed', rule_name: rule_name))
+            else
+              ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_error'))
+              all_rules.each do |rule|
+                puts "netsh #{rule}"
+              end
+            end
           else
-            ui.detail(I18n.t('vagrant_nfs4j.firewall.error'))
+            ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_manual'))
             all_rules.each do |rule|
-              ui.detail("netsh #{rule}")
+              puts "netsh #{rule}"
             end
           end
         end
