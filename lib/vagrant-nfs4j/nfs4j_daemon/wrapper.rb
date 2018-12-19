@@ -84,18 +84,24 @@ module VagrantNfs4j
         end
       end
 
-      def is_running(should_raise_start_failed = false)
+      def is_running(should_raise_start_failed = false, ui = nil)
         unless @api_port
           return false
         end
         begin
-          r = RestClient.get "http://localhost:#{@api_port}/ping", {accept: :json}.merge(self.headers())
+          r = RestClient::Request.execute method: :get, url: "http://localhost:#{@api_port}/ping", headers: {accept: :json}.merge(self.headers()), timeout: 5
           data = JSON.parse(r.body)
           return data === 'pong'
         rescue
           if should_raise_start_failed
             raise StartFailed
           end
+          if ui
+            if $!.is_a?(RestClient::Exceptions::Timeout)
+              raise TimeoutError
+            end
+          end
+          ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.check_has_failed_retrying', {:cause => Nfs4jDaemonErrors.get_message($!)})) if ui
         end
         false
       end
@@ -152,11 +158,12 @@ module VagrantNfs4j
         cmd = "start \"vagrant-nfs4j-daemon\" #{bin}#{opts}"
         ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.is_starting', cmd: cmd))
 
-        pid = spawn(cmd)
-        Process.detach(pid)
+        #pid = spawn(cmd)
+        #Process.detach(pid)
 
         i = 0
-        until self.is_running(i > 30)
+        check_start_time = Time.now
+        until self.is_running(Time.now - check_start_time > 30, ui)
           sleep 1
           i += 1
         end

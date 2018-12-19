@@ -57,6 +57,10 @@ module VagrantNfs4j
       error_key(:unavailable)
     end
 
+    class TimeoutError < Nfs4jDaemonErrors
+      error_key(:timeout_error)
+    end
+
     class StartFailed < Nfs4jDaemonErrors
       error_key(:start_failed)
     end

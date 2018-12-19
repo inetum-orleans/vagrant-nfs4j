@@ -15,10 +15,16 @@ en:
           NFS share detach has failed. (%{cause})
         status_failed: |-
           NFS share status can't be retrieved. (%{cause})
+        timeout_error: |-
+          nfs4j-daemon might be started, but the vagrant process (ruby.exe) is not able to access to its HTTP Endpoint 
+          throw the network (timeout). You should check your network and firewall configuration to allow this 
+          connection to be done. (%{cause})
       is_already_running: |-
         nfs4j-daemon is running and ready to serve.
       is_starting: |-
         nfs4j-daemon is going to start with the following command (%{cmd})
+      check_has_failed_retrying: |-
+        Waiting for nfs4j-daemon to be started. Retrying check ... (%{cause})
       has_been_started: |-
         nfs4j-daemon has been started and is ready to serve.
       installing_firewall_rule: |-
