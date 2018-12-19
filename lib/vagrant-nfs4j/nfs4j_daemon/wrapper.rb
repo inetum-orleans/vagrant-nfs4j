@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'json'
+require 'fileutils'
 
 require_relative 'errors'
 
@@ -30,6 +31,8 @@ module VagrantNfs4j
         elsif File.exist?(@bearer_file)
           File.delete(@bearer_file)
         end
+
+        @setup_firewall_script = "#{Vagrant.user_data_path}/tmp/nfs4j.setup_firewall.bat"
       end
 
       def setup_firewall(ui, setup_firewall, java_home)
@@ -50,24 +53,29 @@ module VagrantNfs4j
         unless system(sprintf(rule_exist, rule_name))
 
 
-          rule_template = "advfirewall firewall add rule name=\"%s\" dir=\"%s\" action=allow protocol=TCP localport=#{ports.join(',')} program=\"%s\" profile=any"
+          rule_template = "netsh advfirewall firewall add rule name=\"%s\" dir=\"%s\" action=allow protocol=TCP localport=#{ports.join(',')} program=\"%s\" profile=any"
 
           all_rules = []
-          all_rules.push("advfirewall firewall delete rule name=\"#{rule_name}\"")
+          all_rules.push("netsh advfirewall firewall delete rule name=\"#{rule_name}\"")
           all_rules.push(sprintf(rule_template, rule_name, 'in', java_exe))
           all_rules.push(sprintf(rule_template, rule_name, 'out', java_exe))
 
-          firewall_script = VagrantNfs4j.get_path_for_file('setupfirewall.vbs')
-          firewall_rule = "cscript //nologo #{firewall_script}"
-
-          all_rules.each do |rule|
-            firewall_rule += " \" #{rule}\""
+          setup_firewall_template_script = VagrantNfs4j.get_path_for_file('request_uac_header.bat')
+          File.delete(@setup_firewall_script) if File.exist?(@setup_firewall_script)
+          FileUtils.cp(setup_firewall_template_script, @setup_firewall_script)
+          open(@setup_firewall_script, 'a') do |f|
+            all_rules.each do |rule|
+              f.puts rule
+            end
           end
 
           if setup_firewall
             ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.installing_firewall_rule', rule_name: rule_name))
 
-            if system(firewall_rule) and system(sprintf(rule_exist, rule_name))
+            setup_firewall_script_response = system(@setup_firewall_script)
+            File.delete(@setup_firewall_script) if File.exist?(@setup_firewall_script)
+
+            if setup_firewall_script_response and system(sprintf(rule_exist, rule_name))
               ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_rule_installed', rule_name: rule_name))
             else
               ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_error'))
