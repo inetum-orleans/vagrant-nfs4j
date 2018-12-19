@@ -158,8 +158,8 @@ module VagrantNfs4j
         cmd = "start \"vagrant-nfs4j-daemon\" #{bin}#{opts}"
         ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.is_starting', cmd: cmd))
 
-        #pid = spawn(cmd)
-        #Process.detach(pid)
+        pid = spawn(cmd)
+        Process.detach(pid)
 
         i = 0
         check_start_time = Time.now
