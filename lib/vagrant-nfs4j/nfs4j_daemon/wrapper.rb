@@ -98,7 +98,7 @@ module VagrantNfs4j
           return false
         end
         begin
-          r = RestClient::Request.execute method: :get, url: "http://localhost:#{@api_port}/ping", headers: {accept: :json}.merge(self.headers()), timeout: 5
+          r = RestClient::Request.execute method: :get, url: "http://127.0.0.1:#{@api_port}/ping", headers: {accept: :json}.merge(self.headers()), timeout: 5
           data = JSON.parse(r.body)
           return data === 'pong'
         rescue
@@ -191,7 +191,7 @@ module VagrantNfs4j
 
       def stop
         begin
-          RestClient.post "http://localhost:#{@api_port}/stop", nil, self.headers()
+          RestClient.post "http://127.0.0.1:#{@api_port}/stop", nil, self.headers()
         rescue
           raise StopFailed
         end
@@ -206,7 +206,7 @@ module VagrantNfs4j
 
       def attach(share)
         begin
-          RestClient.post "http://localhost:#{@api_port}/attach", share.to_json, self.headers()
+          RestClient.post "http://127.0.0.1:#{@api_port}/attach", share.to_json, self.headers()
         rescue RestClient::Exception => e
           if e.http_code != 409
             raise AttachFailed
@@ -220,7 +220,7 @@ module VagrantNfs4j
 
       def detach(share)
         begin
-          RestClient.post "http://localhost:#{@api_port}/detach", share.to_json, self.headers()
+          RestClient.post "http://127.0.0.1:#{@api_port}/detach", share.to_json, self.headers()
         rescue RestClient::Exception => e
           if e.http_code != 409
             raise DetachFailed
@@ -237,7 +237,7 @@ module VagrantNfs4j
           return false
         end
         begin
-          status = RestClient.get "http://localhost:#{@api_port}/status", self.headers()
+          status = RestClient.get "http://127.0.0.1:#{@api_port}/status", self.headers()
           return JSON.parse(status)
         rescue
           raise StatusFailed
