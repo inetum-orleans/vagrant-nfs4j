@@ -3,6 +3,7 @@ require 'json'
 require 'fileutils'
 
 require_relative 'errors'
+require_relative '../utils'
 
 module VagrantNfs4j
   module Nfs4jDaemon
@@ -114,7 +115,33 @@ module VagrantNfs4j
         false
       end
 
-      def start(ui, start, exe, jar, opts, java_home, java_opts)
+      def get_cmd_base(exe, jar, java_home, java_opts)
+        cmd_base = if exe
+                     "\"#{exe.is_a?(String) ? VagrantNfs4j::Utils.which(exe) : @exe}\""
+                   else
+                     java_exe = if java_home
+                                  additional_path = File.join(java_home, 'bin')
+                                  "\"#{VagrantNfs4j::Utils.which("java", additional_path)}\""
+                                else
+                                  "\"#{VagrantNfs4j::Utils.which("java")}\""
+                                end
+                     jar.is_a?(String) ? "#{java_exe} -jar #{jar}" : "#{java_exe} -jar #{@jar}"
+                   end
+
+        unless exe
+          if not java_opts
+            java_opts = ""
+          else
+            java_opts = " #{java_opts}"
+          end
+
+          cmd_base = "#{cmd_base}#{java_opts}"
+        end
+
+        cmd_base
+      end
+
+      def start(ui, start, exe, jar, cmd, opts, java_home, java_opts)
         unless start
           unless self.is_running()
             raise Nfs4jUnavailable.new({api_port: @api_port})
@@ -126,27 +153,10 @@ module VagrantNfs4j
           return false
         end
 
-        bin = if exe
-                exe.is_a?(String) ? exe : @exe
-              else
-                java_exe = if java_home
-                             additional_path = File.join(java_home, 'bin')
-                             VagrantNfs4j::Utils.which("java", additional_path)
-                           else
-                             VagrantNfs4j::Utils.which("java")
-                           end
-
-                jar.is_a?(String) ? "#{java_exe} -jar #{jar}" : "#{java_exe} -jar #{@jar}"
-              end
-
-        unless exe
-          if not java_opts
-            java_opts = " "
-          else
-            java_opts = " #{java_opts}"
-          end
-
-          bin = "#{bin}#{java_opts}"
+        if cmd
+          cmd_base = cmd
+        else
+          cmd_base = self.get_cmd_base(exe, jar, java_home, java_opts)
         end
 
         if opts
@@ -161,7 +171,7 @@ module VagrantNfs4j
         opts = " --api-port=#{@api_port}#{opts}"
         opts = " --no-share#{opts}"
 
-        cmd = "start \"vagrant-nfs4j-daemon\" #{bin}#{opts}"
+        cmd = "start \"vagrant-nfs4j-daemon\" #{cmd_base}#{opts}"
         ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.is_starting', cmd: cmd))
 
         pid = spawn(cmd)

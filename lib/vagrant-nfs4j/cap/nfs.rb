@@ -27,6 +27,7 @@ module VagrantNfs4j
                       config.daemon_start,
                       config.daemon_exe,
                       config.daemon_jar,
+                      config.daemon_cmd,
                       config.daemon_opts,
                       config.java_home,
                       config.java_opts)

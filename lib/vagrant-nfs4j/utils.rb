@@ -70,7 +70,7 @@ module VagrantNfs4j
 
     def self.which(cmd, more_paths = [])
       exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
-      exts = exts.map {|e| e.downcase }
+      exts = exts.map {|e| e.downcase}
 
       path = [more_paths, *ENV['PATH'].split(File::PATH_SEPARATOR)].flatten.map {|path| path.gsub(/\\/, '/')}
       path.each do |path|
@@ -79,7 +79,8 @@ module VagrantNfs4j
           return exe if File.executable?(exe) && !File.directory?(exe)
         end
       end
-      return nil
+
+      return cmd
     end
   end
 end
