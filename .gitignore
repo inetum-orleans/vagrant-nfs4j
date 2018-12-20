@@ -9,3 +9,4 @@
 
 .vagrant
 /*.log
+/vagrant-nfs4j-*.gem
