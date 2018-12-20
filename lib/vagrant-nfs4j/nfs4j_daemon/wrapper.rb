@@ -76,18 +76,18 @@ module VagrantNfs4j
             setup_firewall_script_response = system(@setup_firewall_script)
             File.delete(@setup_firewall_script) if File.exist?(@setup_firewall_script)
 
-            if setup_firewall_script_response and system(sprintf(rule_exist, rule_name))
+            if setup_firewall_script_response
               ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_rule_installed', rule_name: rule_name))
             else
               ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_error'))
               all_rules.each do |rule|
-                puts "netsh #{rule}"
+                puts rule
               end
             end
           else
             ui.detail(I18n.t('vagrant_nfs4j.nfs4j_daemon.firewall_manual'))
             all_rules.each do |rule|
-              puts "netsh #{rule}"
+              puts rule
             end
           end
         end
