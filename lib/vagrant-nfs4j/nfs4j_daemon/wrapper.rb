@@ -168,6 +168,7 @@ module VagrantNfs4j
         if @api_bearer
           opts = " --api-bearer=#{@api_bearer}#{opts}"
         end
+        opts = " --api-ip=127.0.0.1#{opts}"
         opts = " --api-port=#{@api_port}#{opts}"
         opts = " --no-share#{opts}"
 
