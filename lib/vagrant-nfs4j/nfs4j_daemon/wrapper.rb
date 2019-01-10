@@ -119,25 +119,20 @@ module VagrantNfs4j
         cmd_base = if exe
                      "\"#{exe.is_a?(String) ? VagrantNfs4j::Utils.which(exe) : @exe}\""
                    else
+                     if not java_opts
+                       java_opts = ""
+                     else
+                       java_opts = " #{java_opts}"
+                     end
+
                      java_exe = if java_home
                                   additional_path = File.join(java_home, 'bin')
                                   "\"#{VagrantNfs4j::Utils.which("java", additional_path)}\""
                                 else
                                   "\"#{VagrantNfs4j::Utils.which("java")}\""
                                 end
-                     jar.is_a?(String) ? "#{java_exe} -jar #{jar}" : "#{java_exe} -jar #{@jar}"
+                     jar.is_a?(String) ? "#{java_exe}#{java_opts} -jar #{jar}" : "#{java_exe}#{java_opts} -jar #{@jar}"
                    end
-
-        unless exe
-          if not java_opts
-            java_opts = ""
-          else
-            java_opts = " #{java_opts}"
-          end
-
-          cmd_base = "#{cmd_base}#{java_opts}"
-        end
-
         cmd_base
       end
 
