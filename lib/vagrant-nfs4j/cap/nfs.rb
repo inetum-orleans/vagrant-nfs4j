@@ -64,7 +64,7 @@ module VagrantNfs4j
           status['shares'].each do |share|
             share_machine_id = VagrantNfs4j::Utils.get_share_alias_machine_id(share['alias'])
             if share_machine_id and not valid_ids.include? share_machine_id
-              machine.ui.detail(I18n.t('vagrant_nfs4j.cap.nfs_prune.pruning_share',
+              ui.detail(I18n.t('vagrant_nfs4j.cap.nfs_prune.pruning_share',
                                        path: share['path'],
                                        alias: share['alias']))
               wrapper.detach(share)
