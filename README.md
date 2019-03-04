@@ -25,7 +25,7 @@ Vagrant.configure('2') do |config|
                           '/user', # VM Path
                           id: 'user',
                           type: 'nfs',
-                          mount_options: %w(uid=1000 gid=1000)
+                          mount_options: %w(uid=1000 gid=1000 mask=0777)
 end
 ```
 
