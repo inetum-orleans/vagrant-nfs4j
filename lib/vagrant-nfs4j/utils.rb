@@ -58,6 +58,20 @@ module VagrantNfs4j
             end
             share['permissions']['gid'] = gid
           end
+
+          mask = nil
+          mask_matches = /mask=(\d+)/.match(opt)
+          if mask_matches
+            to_delete.push(i)
+            mask = mask_matches.captures[0].to_i
+          end
+
+          if mask and share
+            unless share['permissions']
+              share['permissions'] = {}
+            end
+            share['permissions']['mask'] = mask
+          end
         end
 
         to_delete.reverse.each do |i|
